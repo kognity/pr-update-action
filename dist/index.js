@@ -46,6 +46,7 @@ function run() {
     var _a, _b, _c, _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            core.info('Starting...');
             const inputs = (0, utils_1.getInputs)();
             const prTitle = (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.title) !== null && _b !== void 0 ? _b : '';
             const prBody = (_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.body) !== null && _d !== void 0 ? _d : '';
@@ -61,15 +62,23 @@ function run() {
                 updateRequest.title = newPrTitle;
             if (newPrBody)
                 updateRequest.body = newPrBody;
-            if (!newPrTitle && !newPrBody)
+            core.info(`Request: \n${JSON.stringify(updateRequest)}.`);
+            if (!newPrTitle && !newPrBody) {
+                core.warning('No changes made to PR title or body. Exiting.');
                 return;
+            }
             const octokit = github.getOctokit(inputs.token);
             yield octokit.request(requestEndpoint, updateRequest);
+            core.info('PR updated successfully.');
         }
         catch (error) {
             if ((0, utils_1.isRequestError)(error)) {
                 core.error(error.name);
                 core.setFailed(error.name);
+            }
+            else {
+                core.error('Something went wrong with the request.');
+                core.error(JSON.stringify(error));
             }
         }
     });
@@ -112,7 +121,7 @@ exports.isRequestError = exports.updateBody = exports.updateTitle = exports.getI
 const core = __importStar(__nccwpck_require__(2186));
 function getInputs() {
     return {
-        token: core.getInput('repo-token', { required: true }),
+        token: core.getInput('token', { required: true }),
         title: core.getInput('title'),
         titlePrefix: core.getInput('title-prefix'),
         titleSuffix: core.getInput('title-suffix'),
@@ -125,31 +134,31 @@ function getInputs() {
 exports.getInputs = getInputs;
 function updateTitle(inputs, prTitle) {
     const { title, titlePrefix, titleSuffix } = inputs;
-    core.info(`Current PR title: ${prTitle}`);
+    core.info(`Current PR title: ${prTitle}.`);
     if (title || titlePrefix || titleSuffix) {
         const newTitle = [titlePrefix, title || prTitle, titleSuffix]
             .filter(Boolean)
             .join(' ');
-        core.info(`New title: ${newTitle}`);
+        core.info(`New title: ${newTitle}.`);
         core.setOutput('new-title', newTitle);
         return newTitle;
     }
-    core.warning('No updates were made to PR title');
+    core.warning('No updates were made to PR title.');
 }
 exports.updateTitle = updateTitle;
 function updateBody(inputs, prBody) {
     const { body, bodyPrefix, bodySuffix, bodyConcatNewLine } = inputs;
     const concatStrategy = bodyConcatNewLine ? '\n' : ' ';
-    core.info(`Current PR body: ${prBody}`);
+    core.info(`Current PR body: ${prBody}.`);
     if (body || bodyPrefix || bodySuffix) {
         const newBody = [bodyPrefix, body || prBody, bodySuffix]
             .filter(Boolean)
             .join(concatStrategy);
-        core.info(`New body: ${newBody}`);
+        core.info(`New body: ${newBody}.`);
         core.setOutput('new-body', newBody);
         return newBody;
     }
-    core.warning('No updates were made to PR body');
+    core.warning('No updates were made to PR body.');
 }
 exports.updateBody = updateBody;
 function isRequestError(error) {

@@ -5,6 +5,7 @@ import {getInputs, updateTitle, updateBody, isRequestError} from './utils';
 
 async function run() {
   try {
+    core.info('Starting...');
     const inputs = getInputs();
     const prTitle: string = github.context.payload.pull_request?.title ?? '';
     const prBody: string = github.context.payload.pull_request?.body ?? '';
@@ -23,14 +24,23 @@ async function run() {
     if (newPrTitle) updateRequest.title = newPrTitle;
     if (newPrBody) updateRequest.body = newPrBody;
 
-    if (!newPrTitle && !newPrBody) return;
+    core.info(`Request: \n${JSON.stringify(updateRequest)}.`);
+
+    if (!newPrTitle && !newPrBody) {
+      core.warning('No changes made to PR title or body. Exiting.');
+      return;
+    }
 
     const octokit = github.getOctokit(inputs.token);
     await octokit.request(requestEndpoint, updateRequest);
+    core.info('PR updated successfully.');
   } catch (error) {
     if (isRequestError(error)) {
       core.error(error.name);
       core.setFailed(error.name);
+    } else {
+      core.error('Something went wrong with the request.');
+      core.error(JSON.stringify(error));
     }
   }
 }
