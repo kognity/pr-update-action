@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import styles from 'ansi-styles';
 import {RequestError} from '@octokit/types';
 
 export function getInputs() {
@@ -19,38 +20,58 @@ export function updateTitle(
   prTitle: string
 ): string | undefined {
   const {title, titlePrefix, titleSuffix} = inputs;
-  core.info(`Current PR title: ${prTitle}.`);
+  core.info(
+    `${styles.bold.open}Current PR title:${styles.bold.close} ${prTitle}.`
+  );
 
   if (title || titlePrefix || titleSuffix) {
     const newTitle = [titlePrefix, title || prTitle, titleSuffix]
       .filter(Boolean)
       .join(' ');
-    core.info(`New title: ${newTitle}.`);
+    core.info(
+      `${styles.cyan.open}${styles.bold.open}New title:${styles.bold.close} ${newTitle}${styles.cyan.close}`
+    );
     core.setOutput('new-title', newTitle);
     return newTitle;
   }
 
-  core.warning('No updates were made to PR title.');
+  core.notice(
+    `${styles.blue.open}No updates were made to PR title.${styles.blue.close}`
+  );
 }
 
 export function updateBody(
   inputs: ReturnType<typeof getInputs>,
   prBody: string
 ): string | undefined {
-  const {body, bodyPrefix, bodySuffix, bodyConcatNewLine} = inputs;
+  const {
+    body: bodyLines,
+    bodyPrefix: bodyPrefixLines,
+    bodySuffix: bodySuffixLines,
+    bodyConcatNewLine,
+  } = inputs;
+  const body = bodyLines.join('\n').trim();
+  const bodyPrefix = bodyPrefixLines.join('\n').trim();
+  const bodySuffix = bodySuffixLines.join('\n').trim();
   const concatStrategy = bodyConcatNewLine ? '\n' : ' ';
-  core.info(`Current PR body: ${prBody}.`);
+  core.info(
+    `${styles.bold.open}Current PR body:${styles.bold.close} \n${prBody}.`
+  );
 
   if (body || bodyPrefix || bodySuffix) {
     const newBody = [bodyPrefix, body || prBody, bodySuffix]
       .filter(Boolean)
       .join(concatStrategy);
-    core.info(`New body: ${newBody}.`);
+    core.info(
+      `${styles.cyan.open}${styles.bold.open}New body:${styles.bold.close} \n${newBody}${styles.cyan.close}`
+    );
     core.setOutput('new-body', newBody);
     return newBody;
   }
 
-  core.warning('No updates were made to PR body.');
+  core.notice(
+    `${styles.blue.open}No updates were made to PR body.${styles.blue.close}`
+  );
 }
 
 export function isRequestError(error: unknown): error is RequestError {

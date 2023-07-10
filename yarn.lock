@@ -1432,7 +1432,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-styles@npm:^6.1.0":
+"ansi-styles@npm:^6.1.0, ansi-styles@npm:^6.2.1":
   version: 6.2.1
   resolution: "ansi-styles@npm:6.2.1"
   checksum: ef940f2f0ced1a6347398da88a91da7930c33ecac3c77b72c5905f8b8fe402c52e6fde304ff5347f616e27a742da3f1dc76de98f6866c69251ad0b07a66776d9
@@ -4918,6 +4918,7 @@ __metadata:
     "@types/node": ^20.3.3
     "@typescript-eslint/parser": ^5.61.0
     "@vercel/ncc": ^0.36.1
+    ansi-styles: ^6.2.1
     eslint: ^8.44.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-github: ^4.8.0
