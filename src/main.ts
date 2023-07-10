@@ -1,11 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import styles from 'ansi-styles';
 import {Endpoints, RequestParameters} from '@octokit/types';
 import {getInputs, updateTitle, updateBody, isRequestError} from './utils';
 
 async function run() {
   try {
-    core.info('Starting...');
+    core.info(`${styles.blue.open}Starting...${styles.blue.close}`);
     const inputs = getInputs();
     const prTitle: string = github.context.payload.pull_request?.title ?? '';
     const prBody: string = github.context.payload.pull_request?.body ?? '';
@@ -24,7 +25,11 @@ async function run() {
     if (newPrTitle) updateRequest.title = newPrTitle;
     if (newPrBody) updateRequest.body = newPrBody;
 
-    core.info(`Request: \n${JSON.stringify(updateRequest)}.`);
+    core.info(
+      `${styles.yellow.open}${styles.bold.open}Request:${
+        styles.bold.close
+      } \n${JSON.stringify(updateRequest, null, 4)}.${styles.yellow.close}`
+    );
 
     if (!newPrTitle && !newPrBody) {
       core.warning('No changes made to PR title or body. Exiting.');
@@ -33,7 +38,9 @@ async function run() {
 
     const octokit = github.getOctokit(inputs.token);
     await octokit.request(requestEndpoint, updateRequest);
-    core.info('PR updated successfully.');
+    core.info(
+      `${styles.green.open}PR updated successfully.${styles.green.close}`
+    );
   } catch (error) {
     if (isRequestError(error)) {
       core.error(error.name);

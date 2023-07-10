@@ -1,6 +1,6 @@
 {
   "name": "pr-update-action",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "private": true,
   "description": "PR Update GitHub Action",
   "main": "lib/main.js",
@@ -31,7 +31,8 @@
   "homepage": "https://github.com/kognity/pr-update-action/#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/github": "^5.1.1"
+    "@actions/github": "^5.1.1",
+    "ansi-styles": "^6.2.1"
   },
   "devDependencies": {
     "@types/node": "^20.3.3",
